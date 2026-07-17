@@ -2,25 +2,28 @@
 #include "gameMain.h"
 #include <asserts.h>
 #include "deltaTime.h"
-#include "spriteAtlas.h"
+#include "office.h"
+#include "document.h"
 
 DeltaTime deltaTime;
+
 //Sprite declarations
-SpriteAtlas officeSprite;
+OfficeSprite officeSprite;
+Document document;
 
 bool initGame()
 {
 	//Sprite initializations
-	officeSprite.load("officeAssets.png", 2, 9);
+	officeSprite.load();
+	document.load();
 	return true;
 }
 
 bool updateGame()
 {
 	deltaTime.update();
-	officeSprite.draw(0, 0, 150, 53, 3);
-	officeSprite.draw(1, 0, 30, 20, 3);
-	officeSprite.draw(0, 1, 40, 56, 3);
+	officeSprite.drawOffice();
+	document.draw(250,200);
 	return true;
 }
 

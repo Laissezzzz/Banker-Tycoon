@@ -55,7 +55,7 @@ else()
 
 endif()
 
-target_sources("${CMAKE_PROJECT_NAME}" PRIVATE ${MY_SOURCES}  "src/platform/imGuiHandler.h" "src/gameLayer/deltaTime.h"      "src/platform/gameCanvas.h" "src/gameLayer/spriteAtlas.h")
+target_sources("${CMAKE_PROJECT_NAME}" PRIVATE ${MY_SOURCES}  "src/platform/imGuiHandler.h" "src/gameLayer/deltaTime.h"      "src/platform/gameCanvas.h" "src/gameLayer/spriteAtlas.h" "src/gameLayer/office.h" "src/gameLayer/document.h")
 
 
 if(MSVC) # If using the VS compiler...

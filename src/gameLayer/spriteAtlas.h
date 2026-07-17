@@ -30,35 +30,35 @@ public:
     }
 
     Rectangle getSprite(int row, int column) const {
-        return Rectangle{
-            static_cast<float>(column * spriteWidth),
-            static_cast<float>(row * spriteHeight),
-            static_cast<float>(spriteWidth),
+        if (row < 0 || row >= rows || column < 0 || column >= columns) {
+            TraceLog(LOG_ERROR, "Sprite position out of atlas bounds");
+            return Rectangle{};
+        }
+
+        return Rectangle{static_cast<float>(column * spriteWidth),static_cast<float>(row * spriteHeight),static_cast<float>(spriteWidth),
             static_cast<float>(spriteHeight)
         };
     }
 
     Rectangle getDestination(int posX, int posY, float scale) const {
-        return Rectangle{
-            static_cast<float>(posX),
-            static_cast<float>(posY),
-            static_cast<float>(spriteWidth*scale),
-            static_cast<float>(spriteHeight*scale)
+        return Rectangle{static_cast<float>(posX),static_cast<float>(posY),static_cast<float>(spriteWidth*scale),static_cast<float>(spriteHeight*scale)
         };
     }
 
     Vector2 getCentralOrigin(const Rectangle& destination) const {
-        return Vector2{
-            destination.width / 2.0f,
-            destination.height / 2.0f
-        };
+        return Vector2{destination.width / 2.0f,destination.height / 2.0f};
     }
 
     void draw(int row, int column, int posX, int posY, float scale=1.0) const {
         const Rectangle source = getSprite(row, column);
         const Rectangle destination = getDestination(posX, posY,scale);
-        const Vector2 origin = getCentralOrigin(destination);;
+        const Vector2 origin = getCentralOrigin(destination);
 
         DrawTexturePro(texture, source, destination, origin, 0.0f, WHITE);
     }
+
+    //Getter functions
+    int getSpriteWidth()const {return spriteWidth;}
+    int getSpriteHeight()const { return spriteHeight; }
+    int getSpriteLenght()const {return spriteWidth*spriteHeight/2;}
 };

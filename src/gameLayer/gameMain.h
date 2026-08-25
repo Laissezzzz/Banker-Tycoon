@@ -1,8 +1,8 @@
 #pragma once
-
+#include <mouse.h>
 
 bool initGame();
 
-bool updateGame();
+bool updateGame(const Mouse& mouse);
 
 void closeGame();

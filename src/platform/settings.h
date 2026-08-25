@@ -49,7 +49,7 @@ public:
 
     //Getter functions
     bool getImGuiDock() const { return imguiDock; }
-    bool getImGuiFontSize() const { return imguiFontSize; }
+    float getImGuiFontSize() const { return imguiFontSize; }
     Color getClearColor() const { return clearColor; }
     int getWidth() const { return screenWidth; }
     int getHeight() const { return screenHeight; }

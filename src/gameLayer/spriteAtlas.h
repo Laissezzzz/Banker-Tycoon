@@ -23,8 +23,11 @@ public:
 
         texture = LoadTexture((std::string(RESOURCES_PATH) + name).c_str());
 
+        SetTextureFilter(texture, TEXTURE_FILTER_POINT);
+
         spriteWidth = texture.width / columns;
         spriteHeight = texture.height / rows;
+
         TraceLog(LOG_INFO, "Texture ID: %u", texture.id);
         TraceLog(LOG_INFO, "Texture size: %d x %d", texture.width, texture.height);
     }
@@ -35,30 +38,32 @@ public:
             return Rectangle{};
         }
 
-        return Rectangle{static_cast<float>(column * spriteWidth),static_cast<float>(row * spriteHeight),static_cast<float>(spriteWidth),
+        return Rectangle{
+            static_cast<float>(column * spriteWidth),
+            static_cast<float>(row * spriteHeight),
+            static_cast<float>(spriteWidth),
             static_cast<float>(spriteHeight)
         };
     }
 
     Rectangle getDestination(int posX, int posY, float scale) const {
-        return Rectangle{static_cast<float>(posX),static_cast<float>(posY),static_cast<float>(spriteWidth*scale),static_cast<float>(spriteHeight*scale)
+        return Rectangle{
+            static_cast<float>(posX),
+            static_cast<float>(posY),
+            static_cast<float>(spriteWidth) * scale,
+            static_cast<float>(spriteHeight) * scale
         };
     }
 
-    Vector2 getCentralOrigin(const Rectangle& destination) const {
-        return Vector2{destination.width / 2.0f,destination.height / 2.0f};
-    }
-
-    void draw(int row, int column, int posX, int posY, float scale=1.0) const {
+    void draw(int row, int column, int posX, int posY, float scale = 1.0f) const {
         const Rectangle source = getSprite(row, column);
-        const Rectangle destination = getDestination(posX, posY,scale);
-        const Vector2 origin = getCentralOrigin(destination);
+        const Rectangle destination = getDestination(posX, posY, scale);
 
-        DrawTexturePro(texture, source, destination, origin, 0.0f, WHITE);
+        DrawTexturePro(texture, source, destination, { 0.0f, 0.0f }, 0.0f, WHITE);
     }
 
-    //Getter functions
-    int getSpriteWidth()const {return spriteWidth;}
-    int getSpriteHeight()const { return spriteHeight; }
-    int getSpriteLenght()const {return spriteWidth*spriteHeight/2;}
+    // Getter functions
+    int getSpriteWidth() const { return spriteWidth; }
+    int getSpriteHeight() const { return spriteHeight; }
+    int getSpriteLength() const { return spriteWidth * spriteHeight / 2; }
 };

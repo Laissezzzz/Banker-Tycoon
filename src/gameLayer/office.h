@@ -1,155 +1,165 @@
 #pragma once
 
 #include <raylib.h>
-#include <settings.h>
+
+#include "settings.h"
 #include "spriteAtlas.h"
 
 class OfficeSprite {
 private:
-    SpriteAtlas office{};
-    const float standardScale = 3.0f;
+    SpriteAtlas office;
+
+    static constexpr float standardScale = 3.0f;
+
+    static constexpr Vector2 doorPosition{ 352.0f, -30.0f };
+
+    static constexpr Vector2 leftDeskPosition{ 302.0f, 300.0f };
+    static constexpr Vector2 rightDeskPosition{ 402.0f, 300.0f };
+    static constexpr Vector2 sideDeskPosition{ 650.0f, 170.0f };
+
+    static constexpr Vector2 pencilPosition{ 407.0f, 280.0f };
+    static constexpr Vector2 postItPosition{ 442.0f, 280.0f };
+    static constexpr Vector2 penCupPosition{ 472.0f, 270.0f };
+    static constexpr Vector2 cupPosition{ 422.0f, 285.0f };
+
+    static constexpr Vector2 extinguisherPosition{ 500.0f, 80.0f };
+    static constexpr Vector2 graphPosition{ 584.0f, 50.0f };
+    static constexpr Vector2 printerPosition{ 650.0f, 150.0f };
 
 public:
-    void load() {
-        office.load("officeAssets.png", 2, 9);
+    void load() { office.load("officeAssets.png", 2, 9); }
+
+    // Position ruler
+    void drawPositionRuler() const {
+        constexpr int spacing = 50;
+        constexpr int majorSpacing = 100;
+        constexpr int fontSize = 10;
+
+        for (int x = 0; x < Settings::getVirtualWidth(); x += spacing) {
+            bool majorLine = x % majorSpacing == 0;
+            Color lineColor = majorLine ? Fade(YELLOW, 0.45f) : Fade(WHITE, 0.20f);
+
+            DrawLine(x, 0, x, Settings::getVirtualHeight(), lineColor);
+            DrawText(TextFormat("%d", x), x + 3, 3, fontSize, YELLOW);
+        }
+
+        for (int y = 0; y < Settings::getVirtualHeight(); y += spacing) {
+            bool majorLine = y % majorSpacing == 0;
+            Color lineColor = majorLine ? Fade(YELLOW, 0.45f) : Fade(WHITE, 0.20f);
+
+            DrawLine(0, y, Settings::getVirtualWidth(), y, lineColor);
+            DrawText(TextFormat("%d", y), 3, y + 3, fontSize, YELLOW);
+        }
     }
 
-    void drawDesk(int posX, int posY) const {
-        const float scale = standardScale;
-        office.draw(0, 0, posX, posY, scale);
+    void drawPositionCoordinates(Vector2 position, Vector2 textOffset) const {
+        constexpr int fontSize = 8;
+        constexpr int padding = 2;
+
+        const char* coordinateText = TextFormat("(%.0f, %.0f)", position.x, position.y);
+        int textWidth = MeasureText(coordinateText, fontSize);
+
+        Vector2 textPosition{ position.x + textOffset.x, position.y + textOffset.y };
+
+        DrawLineV(position, textPosition, RED);
+        DrawCircleV(position, 3.0f, RED);
+        DrawRectangle(static_cast<int>(textPosition.x - padding), static_cast<int>(textPosition.y - padding), textWidth + padding * 2, fontSize + padding * 2, Fade(BLACK, 0.80f));
+        DrawText(coordinateText, static_cast<int>(textPosition.x), static_cast<int>(textPosition.y), fontSize, YELLOW);
     }
 
-    void drawPaper(int posX, int posY) const {
-        const float scale = standardScale;
-        office.draw(0, 1, posX, posY, scale);
+    void drawOfficeCoordinates() const {
+        drawPositionCoordinates(doorPosition, { 5.0f, 35.0f });
+
+        drawPositionCoordinates(leftDeskPosition, { -45.0f, 40.0f });
+        drawPositionCoordinates(rightDeskPosition, { 10.0f, 40.0f });
+        drawPositionCoordinates(sideDeskPosition, { 10.0f, 40.0f });
+
+        drawPositionCoordinates(pencilPosition, { -40.0f, -70.0f });
+        drawPositionCoordinates(postItPosition, { -20.0f, -55.0f });
+        drawPositionCoordinates(penCupPosition, { 15.0f, -40.0f });
+        drawPositionCoordinates(cupPosition, { -45.0f, 20.0f });
+
+        drawPositionCoordinates(extinguisherPosition, { 5.0f, -15.0f });
+        drawPositionCoordinates(graphPosition, { 5.0f, -15.0f });
+        drawPositionCoordinates(printerPosition, { 5.0f, -15.0f });
     }
 
-    void drawPencil(int posX, int posY) const {
-        const float scale = standardScale;
-        office.draw(0, 2, posX, posY, scale);
-    }
+    // Simple object drawing
+    void drawDesk(Vector2 position) const { office.draw(0, 0, static_cast<int>(position.x), static_cast<int>(position.y), standardScale); }
+    void drawPaper(Vector2 position) const { office.draw(0, 1, static_cast<int>(position.x), static_cast<int>(position.y), standardScale); }
+    void drawPencil(Vector2 position) const { office.draw(0, 2, static_cast<int>(position.x), static_cast<int>(position.y), standardScale); }
+    void drawPostIt(Vector2 position) const { office.draw(0, 3, static_cast<int>(position.x), static_cast<int>(position.y), standardScale); }
+    void drawPenCup(Vector2 position) const { office.draw(0, 4, static_cast<int>(position.x), static_cast<int>(position.y), standardScale); }
+    void drawPaperSheets(Vector2 position) const { office.draw(0, 5, static_cast<int>(position.x), static_cast<int>(position.y), standardScale); }
+    void drawCup(Vector2 position) const { office.draw(1, 0, static_cast<int>(position.x), static_cast<int>(position.y), standardScale); }
+    void drawPrinter(Vector2 position) const { office.draw(1, 1, static_cast<int>(position.x), static_cast<int>(position.y), standardScale); }
+    void drawUnknownObject(Vector2 position) const { office.draw(1, 2, static_cast<int>(position.x), static_cast<int>(position.y), standardScale); }
+    void drawScreen(Vector2 position) const { office.draw(1, 3, static_cast<int>(position.x), static_cast<int>(position.y), standardScale); }
+    void drawExtinguisher(Vector2 position) const { office.draw(1, 4, static_cast<int>(position.x), static_cast<int>(position.y), standardScale); }
+    void drawGraph(Vector2 position) const { office.draw(1, 5, static_cast<int>(position.x), static_cast<int>(position.y), standardScale); }
+    void drawWall1(Vector2 position) const { office.draw(0, 6, static_cast<int>(position.x), static_cast<int>(position.y), standardScale); }
+    void drawWall2(Vector2 position) const { office.draw(1, 6, static_cast<int>(position.x), static_cast<int>(position.y), standardScale); }
+    void drawFloor1(Vector2 position) const { office.draw(0, 7, static_cast<int>(position.x), static_cast<int>(position.y), standardScale); }
+    void drawFloor2(Vector2 position) const { office.draw(1, 7, static_cast<int>(position.x), static_cast<int>(position.y), standardScale); }
 
-    void drawPostIt(int posX, int posY) const {
-        const float scale = standardScale;
-        office.draw(0, 3, posX, posY, scale);
-    }
+    // Complex object drawing
+    void drawDoor(Vector2 position) const {
+        float spriteHeight = office.getSpriteHeight() * standardScale;
 
-    void drawPenCup(int posX, int posY) const {
-        const float scale = standardScale;
-        office.draw(0, 4, posX, posY, scale);
-    }
-
-    void drawPaperSheets(int posX, int posY) const {
-        const float scale = standardScale;
-        office.draw(0, 5, posX, posY, scale);
-    }
-
-    void drawCup(int posX, int posY) const {
-        const float scale = standardScale;
-        office.draw(1, 0, posX, posY, scale);
-    }
-
-    void drawPrinter(int posX, int posY) const {
-        const float scale = standardScale;
-        office.draw(1, 1, posX, posY, scale);
-    }
-
-    void drawUnknownObject(int posX, int posY) const {
-        const float scale = standardScale;
-        office.draw(1, 2, posX, posY, scale);
-    }
-
-    void drawScreen(int posX, int posY) const {
-        const float scale = standardScale;
-        office.draw(1, 3, posX, posY, scale);
-    }
-
-    void drawExtinguisher(int posX, int posY) const {
-        const float scale = standardScale;
-        office.draw(1, 4, posX, posY, scale);
-    }
-
-    void drawGraph(int posX, int posY) const {
-        const float scale = standardScale;
-        office.draw(1, 5, posX, posY, scale);
-    }
-
-    void drawWall1(int posX, int posY) const {
-        const float scale = standardScale;
-        office.draw(0, 6, posX, posY, scale);
-    }
-
-    void drawWall2(int posX, int posY) const {
-        const float scale = standardScale;
-        office.draw(1, 6, posX, posY, scale);
-    }
-
-    void drawFloor1(int posX, int posY) const {
-        const float scale = standardScale;
-        office.draw(0, 7, posX, posY, scale);
-    }
-
-    void drawFloor2(int posX, int posY) const {
-        const float scale = standardScale;
-        office.draw(1, 7, posX, posY, scale);
-    }
-
-    void drawDoor(int posX, int posY) const {
-        const float scale = standardScale;
-        const float spriteHeight = office.getSpriteHeight() * scale;
-
-        office.draw(0, 8, posX, posY, scale);
-        office.draw(1, 8, posX, posY + static_cast<int>(spriteHeight), scale);
+        office.draw(0, 8, static_cast<int>(position.x), static_cast<int>(position.y), standardScale);
+        office.draw(1, 8, static_cast<int>(position.x), static_cast<int>(position.y + spriteHeight), standardScale);
     }
 
     void drawFloor() const {
-        const float scale = standardScale;
-        const int tileSize = static_cast<int>(office.getSpriteWidth() * scale);
+        int tileSize = static_cast<int>(office.getSpriteWidth() * standardScale);
 
-        for (int y = tileSize / 2; y < Settings::getVirtualHeight() + tileSize; y += tileSize) {
-            for (int x = tileSize / 2; x < Settings::getVirtualWidth() + tileSize; x += tileSize) {
-                drawFloor1(x, y);
+        for (int y = 0; y < Settings::getVirtualHeight(); y += tileSize) {
+            for (int x = 0; x < Settings::getVirtualWidth(); x += tileSize) {
+                drawFloor1({ static_cast<float>(x), static_cast<float>(y) });
             }
         }
     }
 
     void drawWalls() const {
-        const float scale = standardScale;
-        const int tileSize = static_cast<int>(office.getSpriteWidth() * scale);
-        const int firstRowY = tileSize / 2;
-        const int secondRowY = firstRowY + tileSize;
+        int tileSize = static_cast<int>(office.getSpriteWidth() * standardScale);
+        float firstRowY = 0.0f;
+        float secondRowY = static_cast<float>(tileSize - 30);
 
-        for (int x = tileSize / 2; x < Settings::getVirtualWidth() + tileSize; x += tileSize) {
-            drawWall1(x, firstRowY);
-            drawWall1(x, secondRowY-30);
+        for (int x = 0; x < Settings::getVirtualWidth(); x += tileSize) {
+            drawWall1({ static_cast<float>(x), firstRowY });
+            drawWall1({ static_cast<float>(x), secondRowY });
         }
     }
 
-    //Final function
+    // Final drawing function
     void drawOffice() const {
-        // Pavimento
+        // Floor and walls
         drawFloor();
-
-        // Parete superiore
         drawWalls();
 
-        // Porta centrale
-        drawDoor(400, 20);
+        // Door
+        drawDoor(doorPosition);
 
-        // Scrivania principale
-        drawDesk(400, 300);
+        // Desks
+        drawDesk(leftDeskPosition);
+        drawDesk(rightDeskPosition);
+        drawDesk(sideDeskPosition);
 
-        // Oggetti sulla scrivania
-        drawScreen(400, 245);
-        drawPaperSheets(340, 285);
-        drawPencil(455, 280);
-        drawPostIt(490, 280);
-        drawPenCup(520, 270);
-        drawCup(470, 285);
+        // Document rendering is relegated to document.h
 
-        // Altri elementi
-        drawPrinter(650, 100);
-        drawExtinguisher(100, 100);
-        drawGraph(650,80);
+        // Desk objects
+        //drawPencil(pencilPosition);
+        //drawPostIt(postItPosition);
+        //drawPenCup(penCupPosition);
+        //drawCup(cupPosition);
+
+        // Other objects
+        drawExtinguisher(extinguisherPosition);
+        drawGraph(graphPosition);
+        drawPrinter(printerPosition);
+
+        // Debug information
+        //drawPositionRuler();
+        //drawOfficeCoordinates();
     }
 };

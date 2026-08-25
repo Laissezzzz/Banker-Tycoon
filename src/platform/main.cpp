@@ -1,19 +1,24 @@
 #include <raylib.h>
-#include <gameMain.h>
+
+#include "gameMain.h"
 #include "gameCanvas.h"
 #include "settings.h"
 #include "imGuiHandler.h"
+#include "mouse.h"
 
 int main() {
-    Settings settings;
-    GameCanvas gameCanvas;
+    Settings settings{};
+    GameCanvas gameCanvas{};
+    Mouse mouse{};
 
     settings.setupGlobal();
     gameCanvas.setUp();
+
     ImGuiHandler::initialize(settings);
 
     if (!initGame()) {
         ImGuiHandler::shutdown();
+        gameCanvas.close();
         CloseWindow();
         return 1;
     }
@@ -21,11 +26,16 @@ int main() {
     bool running = true;
 
     while (!WindowShouldClose() && running) {
+        ImGuiHandler::beginFrame();
+
+        mouse.update(gameCanvas);
 
         gameCanvas.begin();
-        if (!updateGame()) {
+
+        if (!updateGame(mouse)) {
             running = false;
         }
+
         gameCanvas.end();
 
         BeginDrawing();
@@ -33,17 +43,16 @@ int main() {
 
         gameCanvas.draw();
 
-        ImGuiHandler::beginFrame();
-
         // Interfaccia ImGui
-
         ImGuiHandler::endFrame();
 
         EndDrawing();
     }
 
     closeGame();
+
     ImGuiHandler::shutdown();
+    gameCanvas.close();
     CloseWindow();
 
     return 0;

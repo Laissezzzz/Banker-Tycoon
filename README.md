@@ -341,6 +341,30 @@ The thesis examines information asymmetry in credit markets, introduces gamifica
 Bachelor's Degree in Economics and Management
 University of Macerata
 
+## Credits and Acknowledgements
+
+### Visual Assets
+
+All sprites used in Banker Tycoon, except for the document graphics, come from
+[Pixel Life: Office Essentials](https://christianperich.itch.io/pixel-life-office-essentials)
+by **Chris Perich**.
+
+The asset pack is distributed under the
+[Creative Commons Attribution 4.0 International licence](https://creativecommons.org/licenses/by/4.0/).
+
+The sprites were integrated and, where necessary, adapted for use within
+Banker Tycoon. The document graphics were created specifically for this project.
+
+### C++ and CMake Foundation
+
+The initial C++ project structure and CMake configuration were based on
+materials provided in a Udemy course created by
+[meemknight (Vlod)](https://github.com/meemknight).
+
+The original course setup was subsequently adapted and extended for Banker
+Tycoon, including the integration of raylib, SQLite, the loan-assessment domain
+model, the document-management system and the game-specific architecture.
+
 ## License
 
 This project was developed for academic and educational purposes.

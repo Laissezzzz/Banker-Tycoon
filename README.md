@@ -13,7 +13,7 @@ of loan applications to the final evaluation.
 
 ## Gameplay
 
-
+https://github.com/user-attachments/assets/a968c720-dbd3-436c-a3c1-f9890626114e
 
 During a game cycle, the player receives a sequence of loan applications stored in a SQLite database.
 

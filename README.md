@@ -327,6 +327,9 @@ Planned improvements include:
 * Additional language support
 * Expanded financial-risk models
 
+> A public playable build is not currently available. The repository contains
+> the source code and development build instructions.
+
 ## Thesis
 
 This software accompanies the bachelor's thesis:

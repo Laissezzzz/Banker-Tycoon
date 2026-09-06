@@ -14,7 +14,7 @@ private:
     static constexpr double startingBudget      = 500000.0;
 
     static constexpr double targetBudget        = 550000.0;
-    static constexpr float gameDurationSeconds  = 1000.0f;
+    static constexpr float gameDurationSeconds  = 600.0f;
     static constexpr int loanApplicationCount   = 5;
 
     GamePhase phase                             = GamePhase::InitialScene;

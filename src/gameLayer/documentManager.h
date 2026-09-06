@@ -44,7 +44,10 @@ private:
 
     DocumentType movingDocument = DocumentType::None;
     DocumentType closingDocument = DocumentType::None;
+    DocumentType pressedDocument = DocumentType::None;
     Vector2 mouseOffset{};
+    Vector2 pressPosition{};
+    float dragThreshold = 6.0f;
 
     std::size_t getDocumentIndex(DocumentType documentType) const {
         for (std::size_t index = 0; index < documents.size(); index++) {
@@ -69,6 +72,14 @@ private:
     void updateCloseButtonPosition(std::size_t documentIndex) {
         Rectangle closeButtonRectangle = getCloseButtonRectangle(documents[documentIndex]);
         documentCloseButtons[documentIndex].setRectangle(closeButtonRectangle);
+    }
+
+    void clearDocumentExplanations(DocumentType exception = DocumentType::None) {
+        for (Document& document : documents) {
+            if (document.getType() != exception) {
+                document.clearExplanation();
+            }
+        }
     }
 
 public:
@@ -121,6 +132,10 @@ public:
         }
 
         documentVisibility[documentIndex] = visible;
+
+        if (!visible) {
+            documents[documentIndex].clearExplanation();
+        }
     }
 
     void setDocumentPosition(DocumentType documentType, Vector2 newPosition) {
@@ -150,8 +165,10 @@ public:
 
     void closeAllDocuments() {
         std::fill(documentVisibility.begin(), documentVisibility.end(), false);
+        clearDocumentExplanations();
         movingDocument = DocumentType::None;
         closingDocument = DocumentType::None;
+        pressedDocument = DocumentType::None;
     }
 
     void reset() { closeAllDocuments(); }
@@ -250,6 +267,7 @@ public:
         if (mouse.isLeftPressed()) {
             Rectangle selectedRectangle{};
             movingDocument = DocumentType::None;
+            pressedDocument = DocumentType::None;
 
             for (auto iterator = documentOrder.rbegin(); iterator != documentOrder.rend(); iterator++) {
                 DocumentType documentType = *iterator;
@@ -261,25 +279,47 @@ public:
                 Rectangle documentDestination = getDocumentDestination(documentType);
 
                 if (mouse.isInside(documentDestination)) {
-                    movingDocument = documentType;
+                    pressedDocument = documentType;
                     selectedRectangle = documentDestination;
                     break;
                 }
             }
 
-            if (movingDocument != DocumentType::None) {
+            if (pressedDocument != DocumentType::None) {
                 mouseOffset = { mousePosition.x - selectedRectangle.x, mousePosition.y - selectedRectangle.y };
-                bringDocumentToFront(movingDocument);
+                pressPosition = mousePosition;
+                bringDocumentToFront(pressedDocument);
             }
         }
 
-        if (mouse.isLeftReleased()) {
-            movingDocument = DocumentType::None;
+        if (mouse.isLeftDown() && pressedDocument != DocumentType::None && movingDocument == DocumentType::None) {
+            float movementX = mousePosition.x - pressPosition.x;
+            float movementY = mousePosition.y - pressPosition.y;
+            float movementSquared = movementX * movementX + movementY * movementY;
+
+            if (movementSquared >= dragThreshold * dragThreshold) {
+                movingDocument = pressedDocument;
+                clearDocumentExplanations();
+            }
         }
 
         if (movingDocument != DocumentType::None) {
             Vector2 newPosition{ mousePosition.x - mouseOffset.x, mousePosition.y - mouseOffset.y };
             setDocumentPosition(movingDocument, newPosition);
+        }
+
+        if (mouse.isLeftReleased()) {
+            if (pressedDocument != DocumentType::None && movingDocument == DocumentType::None) {
+                std::size_t documentIndex = getDocumentIndex(pressedDocument);
+
+                if (documentIndex < documents.size() && mouse.isInside(documents[documentIndex].getRectangle())) {
+                    clearDocumentExplanations(pressedDocument);
+                    documents[documentIndex].toggleExplanation(mousePosition);
+                }
+            }
+
+            pressedDocument = DocumentType::None;
+            movingDocument = DocumentType::None;
         }
     }
 

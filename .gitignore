@@ -1,24 +1,9 @@
-# Build CMake
-build/
+# File non distribuiti
+CMakeLists.txt
+resources/officeAssets.png
+
+# Build / local
 out/
-CMakeFiles/
-CMakeCache.txt
-cmake_install.cmake
-Makefile
-build.ninja
-.ninja_deps
-.ninja_log
-CPackConfig.cmake
-CPackSourceConfig.cmake
-
-# Emscripten build output, se non vuoi versionarlo
-*.wasm
-*.data
-*.js
-
-# Sprite / assets che non vuoi su GitHub
-sprites/
-assets/sprites/
-*.png
-*.jpg
-*.jpeg
+build/
+.vs/
+web/

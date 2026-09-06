@@ -3,7 +3,6 @@
 #include "gameMain.h"
 #include "gameCanvas.h"
 #include "settings.h"
-#include "imGuiHandler.h"
 #include "mouse.h"
 
 int main() {
@@ -14,10 +13,8 @@ int main() {
     settings.setupGlobal();
     gameCanvas.setUp();
 
-    ImGuiHandler::initialize(settings);
 
     if (!initGame()) {
-        ImGuiHandler::shutdown();
         gameCanvas.close();
         CloseWindow();
         return 1;
@@ -26,7 +23,6 @@ int main() {
     bool running = true;
 
     while (!WindowShouldClose() && running) {
-        ImGuiHandler::beginFrame();
 
         mouse.update(gameCanvas);
 
@@ -43,15 +39,12 @@ int main() {
 
         gameCanvas.draw();
 
-        // Interfaccia ImGui
-        ImGuiHandler::endFrame();
 
         EndDrawing();
     }
 
     closeGame();
 
-    ImGuiHandler::shutdown();
     gameCanvas.close();
     CloseWindow();
 

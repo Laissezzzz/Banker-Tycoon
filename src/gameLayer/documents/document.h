@@ -126,7 +126,7 @@ private:
 
         case DocumentType::CreditReport:
             switch (row) {
-            case 0: return { "Centrale rischi", "Istituto che racchiude tutte le informazioni su un cliente fornite da tutte le banche." };
+            case 0: return { "Centrale rischi", "Riassume i debiti del cliente e le difficoltà di pagamento registrate nel sistema creditizio." };
             case 1: return { "Esposizione totale", "Somma complessiva dei debiti e dei finanziamenti ancora a carico del cliente." };
             case 2: return { "Prestiti attivi", "Numero di finanziamenti che il cliente sta già rimborsando." };
             case 3: return { "Rate mensili", "Totale delle rate pagate ogni mese; riduce il reddito disponibile per un nuovo prestito." };
@@ -298,7 +298,8 @@ private:
 
         for (int column = 1; column < columns; column++) {
             float x = grid.x + currentCellWidth * static_cast<float>(column);
-            DrawLineV({ x, grid.y }, { x, grid.y + grid.height }, GRAY);
+            float firstDataRowY = grid.y + currentCellHeight;
+            DrawLineV({ x, firstDataRowY }, { x, grid.y + grid.height }, GRAY);
         }
     }
 
@@ -311,6 +312,20 @@ private:
 
         BeginScissorMode(static_cast<int>(cell.x + 1.0f), static_cast<int>(cell.y + 1.0f), static_cast<int>(cell.width - 2.0f), static_cast<int>(cell.height - 2.0f));
         DrawText(text, textX, textY, fittingFontSize, color);
+        EndScissorMode();
+    }
+
+    void drawTitleText(const char* text) const {
+        Rectangle grid = getGridRectangle();
+        Rectangle firstCell = getCellRectangle(0, 0);
+        Rectangle titleRectangle{ grid.x, firstCell.y, grid.width, firstCell.height };
+        int fittingFontSize = getFittingFontSize(text, titleRectangle);
+
+        int textX = static_cast<int>(titleRectangle.x + textPadding);
+        int textY = static_cast<int>(titleRectangle.y + (titleRectangle.height - static_cast<float>(fittingFontSize)) / 2.0f);
+
+        BeginScissorMode(static_cast<int>(titleRectangle.x + 1.0f), static_cast<int>(titleRectangle.y + 1.0f), static_cast<int>(titleRectangle.width - 2.0f), static_cast<int>(titleRectangle.height - 2.0f));
+        DrawText(text, textX, textY, fittingFontSize, BLACK);
         EndScissorMode();
     }
 
@@ -360,7 +375,7 @@ public:
         std::string maritalStatus = getMaritalStatusText(client);
 
         drawDocumentGrid();
-        drawCellText("DATI CLIENTE", 0, 0);
+        drawTitleText("DATI CLIENTE");
         drawField("Nome", client.getName().c_str(), 1);
         drawField("Cognome", client.getSurname().c_str(), 2);
         drawField("Data di nascita", client.getBirthDate().c_str(), 3);
@@ -370,7 +385,7 @@ public:
 
     void drawFinancialSituation(const FinancialSituation& financialSituation) const {
         drawDocumentGrid();
-        drawCellText("SITUAZIONE FINANZIARIA", 0, 0);
+        drawTitleText("SITUAZIONE FINANZIARIA");
         drawField("Saldo medio", TextFormat("%.2f$", financialSituation.getAverageBalance()), 1);
         drawField("Risparmi disponibili", TextFormat("%.2f$", financialSituation.getAvailableSavings()), 2);
         drawField("Valore immobili", TextFormat("%.2f$", financialSituation.getRealEstateValue()), 3);
@@ -380,7 +395,7 @@ public:
 
     void drawCreditReport(const CreditReport& creditReport) const {
         drawDocumentGrid();
-        drawCellText("CENTRALE RISCHI", 0, 0);
+        drawTitleText("CENTRALE RISCHI");
         drawField("Esposizione totale", TextFormat("%.2f$", creditReport.getTotalExposure()), 1);
         drawField("Prestiti attivi", TextFormat("%d", creditReport.getActiveLoansCount()), 2);
         drawField("Rate mensili", TextFormat("%.2f$", creditReport.getTotalMonthlyPayments()), 3);
@@ -390,7 +405,7 @@ public:
 
     void drawEmploymentSituation(const EmploymentSituation& employmentSituation) const {
         drawDocumentGrid();
-        drawCellText("SITUAZIONE LAVORATIVA", 0, 0);
+        drawTitleText("SITUAZIONE LAVORATIVA");
         drawField("Professione", employmentSituation.getProfession().c_str(), 1);
         drawField("Contratto", EmploymentSituation::employmentTypeToString(employmentSituation.getEmploymentType()), 2);
         drawField("Reddito mensile", TextFormat("%.2f$", employmentSituation.getMonthlyIncome()), 3);
@@ -399,7 +414,7 @@ public:
 
     void drawInternalBehavior(const InternalBehavior& internalBehavior) const {
         drawDocumentGrid();
-        drawCellText("ANDAMENTO INTERNO", 0, 0);
+        drawTitleText("ANDAMENTO INTERNO");
         drawField("Anni da cliente", TextFormat("%.2f", internalBehavior.getYearsWithBank()), 1);
         drawField("Sconfinamenti", TextFormat("%d", internalBehavior.getOverdraftCount()), 2);
         drawField("Massimo sconfinamento", TextFormat("%.2f$", internalBehavior.getMaximumOverdraft()), 3);
@@ -409,7 +424,7 @@ public:
 
     void drawLoan(const Loan& loan) const {
         drawDocumentGrid();
-        drawCellText("RICHIESTA DI PRESTITO", 0, 0);
+        drawTitleText("RICHIESTA DI PRESTITO");
         drawField("Finalità", loan.getPurpose().c_str(), 1);
         drawField("Importo richiesto", TextFormat("%.2f$", loan.getRequestedAmount()), 2);
         drawField("Tasso di interesse", TextFormat("%.2f%%", loan.getInterestRate() * 100.0), 3);
@@ -419,7 +434,7 @@ public:
 
     void drawLoanResult(const Loan& loan) const {
         drawDocumentGrid();
-        drawCellText("RISULTATO PRESTITO", 0, 0);
+        drawTitleText("RISULTATO PRESTITO");
         drawField("Prestito ID", TextFormat("%d", loan.getLoanId()), 1);
         drawField("Importo richiesto", TextFormat("%.2f$", loan.getRequestedAmount()), 2);
         drawField("Decisione", getLoanStatusText(loan), 3);

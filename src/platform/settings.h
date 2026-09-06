@@ -23,10 +23,6 @@ private:
     inline static int targetFPS = 120;
     inline static Color clearColor = BLACK;
 
-    // ImGui
-    inline static bool imguiDock = true;
-    inline static float imguiFontSize = 2.0f;
-
     // Audio
     inline static float masterVolume = 1.0f;
 
@@ -48,8 +44,6 @@ public:
     }
 
     //Getter functions
-    bool getImGuiDock() const { return imguiDock; }
-    float getImGuiFontSize() const { return imguiFontSize; }
     Color getClearColor() const { return clearColor; }
     int getWidth() const { return screenWidth; }
     int getHeight() const { return screenHeight; }

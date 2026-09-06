@@ -267,41 +267,6 @@ The following software is required:
 
 The source code for raylib and SQLite is included in the project's `thirdparty` directory and configured through CMake.
 
-## Building the Project
-
-Clone the repository:
-
-```bash
-git clone https://github.com/Laissezzzz/Banker-Tycoon.git
-cd Banker-Tycoon
-```
-
-### Visual Studio
-
-Open the repository folder directly in Visual Studio 2026.
-
-Visual Studio will detect `CMakeLists.txt` and configure the project automatically. Select the desired build configuration and use:
-
-```text
-Build → Build All
-```
-
-### Command Line
-
-Alternatively, configure the project from the command line:
-
-```bash
-cmake -S . -B out/build
-```
-
-Build the project:
-
-```bash
-cmake --build out/build --config Release
-```
-
-The generated executable will be located inside the selected build directory. Its exact path may depend on the active CMake configuration.
-
 ## Educational Purpose
 
 The game is designed to illustrate how incomplete and asymmetric information affects lending decisions.

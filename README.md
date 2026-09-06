@@ -1,6 +1,6 @@
 # Banker Tycoon
 
-🎮 **Play the game:** https://bankertycoon.com
+🎮 **Play the game:** [https://bankertycoon.com](https://defaultgameproject.com)
 
 **Banker Tycoon** is an educational loan-assessment game developed in **C++** using **raylib** and **SQLite**.
 

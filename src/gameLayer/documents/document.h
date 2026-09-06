@@ -22,12 +22,14 @@ private:
     Vector2 position{ 0.0f, 0.0f };
 
     int fontSize = 8;
+    int minimumFontSize = 5;
     int rows = 10;
     int columns = 2;
 
     float offset = 10.0f;
     float cellWidth = 140.0f;
     float cellHeight = 22.0f;
+    float textPadding = 4.0f;
 
     float width = cellWidth * static_cast<float>(columns) + offset * 2.0f;
     float height = cellHeight * static_cast<float>(rows) + offset * 2.0f;
@@ -45,6 +47,17 @@ private:
         return { grid.x + currentCellWidth * static_cast<float>(column), grid.y + currentCellHeight * static_cast<float>(row), currentCellWidth, currentCellHeight };
     }
 
+    int getFittingFontSize(const char* text, const Rectangle& cell) const {
+        int fittingFontSize = fontSize;
+        float availableWidth = cell.width - textPadding * 2.0f;
+
+        while (fittingFontSize > minimumFontSize && static_cast<float>(MeasureText(text, fittingFontSize)) > availableWidth) {
+            fittingFontSize--;
+        }
+
+        return fittingFontSize;
+    }
+
     std::string getMaritalStatusText(const Client& client) const {
         const std::string& maritalStatus = client.getMaritalStatus();
 
@@ -54,6 +67,18 @@ private:
 
         if (maritalStatus == "single" || maritalStatus == "Single") {
             return "Celibe/Nubile";
+        }
+
+        if (maritalStatus == "separated" || maritalStatus == "Separated") {
+            return "Separato/a";
+        }
+
+        if (maritalStatus == "divorced" || maritalStatus == "Divorced") {
+            return "Divorziato/a";
+        }
+
+        if (maritalStatus == "widowed" || maritalStatus == "Widowed") {
+            return "Vedovo/a";
         }
 
         return maritalStatus;
@@ -92,15 +117,21 @@ private:
         }
     }
 
-    void drawCellText(const char* text, int row, int column) const {
+    void drawCellText(const char* text, int row, int column, Color color = BLACK) const {
         Rectangle cell = getCellRectangle(row, column);
-        DrawText(text, static_cast<int>(cell.x + 4.0f), static_cast<int>(cell.y + (cell.height - static_cast<float>(fontSize)) / 2.0f), fontSize, BLACK);
+        int fittingFontSize = getFittingFontSize(text, cell);
+
+        int textX = static_cast<int>(cell.x + textPadding);
+        int textY = static_cast<int>(cell.y + (cell.height - static_cast<float>(fittingFontSize)) / 2.0f);
+
+        BeginScissorMode(static_cast<int>(cell.x + 1.0f), static_cast<int>(cell.y + 1.0f), static_cast<int>(cell.width - 2.0f), static_cast<int>(cell.height - 2.0f));
+        DrawText(text, textX, textY, fittingFontSize, color);
+        EndScissorMode();
     }
 
     void drawField(const char* label, const char* value, int row, Color valueColor = BLACK) const {
         drawCellText(label, row, 0);
-        Rectangle cell = getCellRectangle(row, 1);
-        DrawText(value, static_cast<int>(cell.x + 4.0f), static_cast<int>(cell.y + (cell.height - static_cast<float>(fontSize)) / 2.0f), fontSize, valueColor);
+        drawCellText(value, row, 1, valueColor);
     }
 
 public:
@@ -126,11 +157,7 @@ public:
 
     // Drawing individual documents
     void drawClientDocument(const Client& client) const {
-        std::string maritalStatus = "Celibe/Nubile";
-
-        if (client.getMaritalStatus() == "Married") {
-            maritalStatus = "Sposato/a";
-        }
+        std::string maritalStatus = getMaritalStatusText(client);
 
         drawDocumentGrid();
         drawCellText("DATI CLIENTE", 0, 0);

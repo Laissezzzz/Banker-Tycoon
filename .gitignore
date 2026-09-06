@@ -1,11 +1,24 @@
-/out
-bin/
+# Build CMake
 build/
-
-/.vs
-.idea/
-CMakeSettings.json
+out/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
 Makefile
+build.ninja
+.ninja_deps
+.ninja_log
+CPackConfig.cmake
+CPackSourceConfig.cmake
 
-settings/
-saves/
+# Emscripten build output, se non vuoi versionarlo
+*.wasm
+*.data
+*.js
+
+# Sprite / assets che non vuoi su GitHub
+sprites/
+assets/sprites/
+*.png
+*.jpg
+*.jpeg

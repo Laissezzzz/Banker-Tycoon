@@ -1,5 +1,7 @@
 # Banker Tycoon
 
+🎮 **Play the game:** https://bankertycoon.com
+
 **Banker Tycoon** is an educational loan-assessment game developed in **C++** using **raylib** and **SQLite**.
 
 The player acts as a bank employee and must examine loan applications, analyse the available financial documents, and decide whether each application should be accepted or rejected.

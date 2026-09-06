@@ -2,98 +2,173 @@
 
 #include <raylib.h>
 #include <algorithm>
+
 #include "settings.h"
 
 class GameCanvas {
-	RenderTexture2D canvas{};
-	Color backgroundTint = DARKGRAY;
-	float margin = 20.0f;
-	float lineThickness = 2.0f;
-	float rotation = 0.0f;
+private:
+    RenderTexture2D canvas{};
+
+    static constexpr float desktopMargin = 20.0f;
+    static constexpr float webMargin = 2.0f;
+    static constexpr float lineThickness = 2.0f;
+    static constexpr float rotation = 0.0f;
+
+    Color backgroundTint = DARKGRAY;
+
+    float getEffectiveMargin() const {
+#if defined(PLATFORM_WEB)
+        return webMargin;
+#else
+        const float smallestScreenSide = static_cast<float>(
+            std::min(GetScreenWidth(), GetScreenHeight())
+            );
+
+        const float largestSafeMargin = std::max(
+            0.0f,
+            (smallestScreenSide - 1.0f) * 0.5f
+        );
+
+        return std::min(desktopMargin, largestSafeMargin);
+#endif
+    }
+
 public:
-	void setUp() {
-		canvas = LoadRenderTexture(Settings::getVirtualWidth(), Settings::getVirtualHeight());
-		SetTextureFilter(canvas.texture, TEXTURE_FILTER_POINT);
-	}
+    void setUp() {
+        canvas = LoadRenderTexture(
+            Settings::getVirtualWidth(),
+            Settings::getVirtualHeight()
+        );
 
-	void begin() const {
-		BeginTextureMode(canvas);
-		ClearBackground(backgroundTint);
-	}
+        SetTextureFilter(canvas.texture, TEXTURE_FILTER_POINT);
+    }
 
-	void end() const {
-		EndTextureMode();
-	}
+    void begin() const {
+        BeginTextureMode(canvas);
+        ClearBackground(backgroundTint);
+    }
 
-	void draw() const {
-		const float availableWidth = GetScreenWidth() - margin * 2.0f;
-		const float availableHeight = GetScreenHeight() - margin * 2.0f;
+    void end() const {
+        EndTextureMode();
+    }
 
-		const float scaleX = availableWidth / static_cast<float>(Settings::getVirtualWidth());
-		const float scaleY = availableHeight / static_cast<float>(Settings::getVirtualHeight());
-		const float scale = std::min(scaleX, scaleY);
+    Rectangle getDestinationRectangle() const {
+        const float screenWidth = static_cast<float>(
+            std::max(1, GetScreenWidth())
+            );
+        const float screenHeight = static_cast<float>(
+            std::max(1, GetScreenHeight())
+            );
+        const float margin = getEffectiveMargin();
 
-		const float width = Settings::getVirtualWidth() * scale;
-		const float height = Settings::getVirtualHeight() * scale;
+        const float availableWidth = std::max(
+            1.0f,
+            screenWidth - margin * 2.0f
+        );
+        const float availableHeight = std::max(
+            1.0f,
+            screenHeight - margin * 2.0f
+        );
 
-		const float offsetX = (GetScreenWidth() - width) / 2.0f;
-		const float offsetY = (GetScreenHeight() - height) / 2.0f;
+        const float scaleX = availableWidth /
+            static_cast<float>(Settings::getVirtualWidth());
+        const float scaleY = availableHeight /
+            static_cast<float>(Settings::getVirtualHeight());
+        const float scale = std::max(0.001f, std::min(scaleX, scaleY));
 
-		const Rectangle source{ 0.0f, 0.0f, static_cast<float>(Settings::getVirtualWidth()), -static_cast<float>(Settings::getVirtualHeight()) };
-		const Rectangle destination{ offsetX, offsetY, width, height };
+        const float width =
+            static_cast<float>(Settings::getVirtualWidth()) * scale;
+        const float height =
+            static_cast<float>(Settings::getVirtualHeight()) * scale;
 
-		DrawTexturePro(canvas.texture, source, destination, Vector2{}, rotation, WHITE);
-		DrawRectangleLinesEx(destination, lineThickness, WHITE);
-	}
+        return {
+            (screenWidth - width) * 0.5f,
+            (screenHeight - height) * 0.5f,
+            width,
+            height
+        };
+    }
 
-	void close() {
-		UnloadRenderTexture(canvas);
-	}
+    void draw() const {
+        const Rectangle source{
+            0.0f,
+            0.0f,
+            static_cast<float>(Settings::getVirtualWidth()),
+            -static_cast<float>(Settings::getVirtualHeight())
+        };
+        const Rectangle destination = getDestinationRectangle();
 
-	//Getter functions
-	const RenderTexture2D& getCanvas() const {return canvas;}
-	int getCanvasWidth() const {return Settings::getVirtualWidth();	}
-	int getCanvasHeight() const {return Settings::getVirtualHeight();}
+        DrawTexturePro(
+            canvas.texture,
+            source,
+            destination,
+            Vector2{},
+            rotation,
+            WHITE
+        );
 
-	float getScale() const {
-		const float availableWidth = GetScreenWidth() - margin * 2.0f;
-		const float availableHeight = GetScreenHeight() - margin * 2.0f;
+        DrawRectangleLinesEx(destination, lineThickness, WHITE);
+    }
 
-		const float scaleX = availableWidth / static_cast<float>(Settings::getVirtualWidth());
-		const float scaleY = availableHeight / static_cast<float>(Settings::getVirtualHeight());
+    void close() {
+        if (canvas.id != 0) {
+            UnloadRenderTexture(canvas);
+            canvas = {};
+        }
+    }
 
-		return std::min(scaleX, scaleY);
-	}
+    const RenderTexture2D& getCanvas() const {
+        return canvas;
+    }
 
-	Vector2 getCanvasOffset() const {
-		const float scale = getScale();
+    int getCanvasWidth() const {
+        return Settings::getVirtualWidth();
+    }
 
-		const float width = Settings::getVirtualWidth() * scale;
-		const float height = Settings::getVirtualHeight() * scale;
+    int getCanvasHeight() const {
+        return Settings::getVirtualHeight();
+    }
 
-		return {
-			(GetScreenWidth() - width) / 2.0f,
-			(GetScreenHeight() - height) / 2.0f
-		};
-	}
+    float getScale() const {
+        return getDestinationRectangle().width /
+            static_cast<float>(Settings::getVirtualWidth());
+    }
 
-	Vector2 getMousePosition() const {
-		const Vector2 mousePos = ::GetMousePosition();
-		const Vector2 offset = getCanvasOffset();
-		const float scale = getScale();
+    Vector2 getCanvasOffset() const {
+        const Rectangle destination = getDestinationRectangle();
+        return { destination.x, destination.y };
+    }
 
-		return {
-			(mousePos.x - offset.x) / scale,
-			(mousePos.y - offset.y) / scale
-		};
-	}
+    Vector2 getCanvasPosition(Vector2 screenPosition) const {
+        const Rectangle destination = getDestinationRectangle();
+        const float scale = destination.width /
+            static_cast<float>(Settings::getVirtualWidth());
 
-	bool isMouseInside() const {
-		const Vector2 mousePos = getMousePosition();
+        return {
+            (screenPosition.x - destination.x) / scale,
+            (screenPosition.y - destination.y) / scale
+        };
+    }
 
-		return mousePos.x >= 0.0f &&
-			mousePos.y >= 0.0f &&
-			mousePos.x < Settings::getVirtualWidth() &&
-			mousePos.y < Settings::getVirtualHeight();
-	}
+    bool isCanvasPositionInside(Vector2 canvasPosition) const {
+        return canvasPosition.x >= 0.0f &&
+            canvasPosition.y >= 0.0f &&
+            canvasPosition.x < static_cast<float>(Settings::getVirtualWidth()) &&
+            canvasPosition.y < static_cast<float>(Settings::getVirtualHeight());
+    }
+
+    bool isScreenPositionInside(Vector2 screenPosition) const {
+        return CheckCollisionPointRec(
+            screenPosition,
+            getDestinationRectangle()
+        );
+    }
+
+    Vector2 getMousePosition() const {
+        return getCanvasPosition(::GetMousePosition());
+    }
+
+    bool isMouseInside() const {
+        return isScreenPositionInside(::GetMousePosition());
+    }
 };

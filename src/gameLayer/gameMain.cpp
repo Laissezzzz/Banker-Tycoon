@@ -121,10 +121,6 @@ bool gameResult(const Mouse& mouse) {
         loanApplicationManager.initialize(bankDb, game);
     }
 
-    if (gameResultMenuObject.isExitRequested()) {
-        return false;
-    }
-
     gameResultMenuObject.draw(game, game.getPlayer(), loanApplicationManager);
 
     return true;

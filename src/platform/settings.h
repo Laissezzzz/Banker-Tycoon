@@ -5,48 +5,53 @@
 
 class Settings {
 private:
-    // General settings
-    inline static constexpr bool productionBuild = false;
+    inline static constexpr int screenWidth = 800;
+    inline static constexpr int screenHeight = 450;
 
-    // Window
-    inline static int screenWidth = 800;
-    inline static int screenHeight = screenWidth;
-    inline static std::string title = "Banker Tycoon";
-    inline static bool windowResizable = true;
-    inline static bool closeOnEscape = false;
-
-    // Canvas
     inline static constexpr int virtualWidth = 800;
     inline static constexpr int virtualHeight = 450;
 
-    // Rendering
-    inline static int targetFPS = 120;
-    inline static Color clearColor = BLACK;
+    inline static constexpr int targetFPS = 60;
+    inline static constexpr bool windowResizable = true;
+    inline static constexpr int closeKey = 0;
 
-    // Audio
-    inline static float masterVolume = 1.0f;
+    inline static const std::string title = "Banker Tycoon";
+    inline static constexpr Color clearColor = BLACK;
 
 public:
     static void setupGlobal() {
-        if constexpr (productionBuild) {
-            SetTraceLogLevel(LOG_NONE);
-        }
+#if PRODUCTION_BUILD
+        SetTraceLogLevel(LOG_NONE);
+#endif
 
-        if (windowResizable) {
+#if !defined(PLATFORM_WEB)
+        if constexpr (windowResizable) {
             SetConfigFlags(FLAG_WINDOW_RESIZABLE);
         }
+#endif
 
-        InitWindow(screenWidth,screenHeight,title.c_str());
-
-        SetExitKey(closeOnEscape);
-
+        InitWindow(screenWidth, screenHeight, title.c_str());
+        SetExitKey(closeKey);
         SetTargetFPS(targetFPS);
     }
 
-    //Getter functions
-    Color getClearColor() const { return clearColor; }
-    int getWidth() const { return screenWidth; }
-    int getHeight() const { return screenHeight; }
-    static int getVirtualWidth() {return virtualWidth;}
-    static int getVirtualHeight() {return virtualHeight;}
+    static constexpr Color getClearColor() {
+        return clearColor;
+    }
+
+    static constexpr int getWidth() {
+        return screenWidth;
+    }
+
+    static constexpr int getHeight() {
+        return screenHeight;
+    }
+
+    static constexpr int getVirtualWidth() {
+        return virtualWidth;
+    }
+
+    static constexpr int getVirtualHeight() {
+        return virtualHeight;
+    }
 };
